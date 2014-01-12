@@ -31,8 +31,6 @@ gulp.task 'pages', ['layout'], ->
 
   layout  = fs.readFileSync './tmp/layout.html'
   nav     = fs.readFileSync './tmp/nav.html'
-
-  layout = fs.readFileSync './tmp/layout.html'
   applyLayout = mapStream (file, cb) ->
     if file.isNull()
       cb null, file
@@ -117,3 +115,5 @@ gulp.task 'dev', ->
   gulp.watch './src/**/*.haml', -> gulp.run 'layout'
   gulp.watch './src/**/*.coffee', -> gulp.run 'bundle-coffee'
   gulp.watch './src/**/*.less', -> gulp.run 'bundle-less'
+
+  gulp.run 'build-all'

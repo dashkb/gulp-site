@@ -6,3 +6,11 @@ This is the index
 * Of
 * Things
 * Ahem
+
+```ruby
+class DoesItWork
+  def it(would)
+    be "cool"
+  end
+end
+```
