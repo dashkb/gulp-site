@@ -1,8 +1,14 @@
 @import '../bower_components/bootstrap/less/bootstrap';
 @import '../bower_components/font-awesome/less/font-awesome';
 
+@import url(http://fonts.googleapis.com/css?family=Roboto:300,300italic,500);
+
 html, body, #page, #content {
   height: 100%;
+  font-family: 'Roboto', 'Helvetica', sans-serif;
+  font-weight: 300;
+  font-size: 15px;
+  letter-spacing: 1px;
 }
 
 #page {
@@ -15,10 +21,12 @@ html, body, #page, #content {
 
 #nav ul {
   .list-group;
+  border: 0px;
   border-radius: 3px;
-  background: darken(#fff, 3%);
   li {
     .list-group-item;
+    border: 0px;
+    padding-left: 5px;
   }
 
   li.name {
@@ -30,26 +38,41 @@ html, body, #page, #content {
   }
 }
 
+#content {
+  img {
+    .pull-left();
+    margin-right: 8px;
+    max-height: 100px;
+  }
+
+  .lead {
+    font-size: 24px;
+    line-height: 1.45;
+  }
+
+  hr {
+    margin-top: 0px;
+    margin-bottom: 15px;
+  }
+}
+
 @media (min-width: @screen-sm-min) {
   #nav {
     display: block;
     margin-top: 20px;
-    .make-sm-column(3);
+    .make-sm-column(4);
     .pull-right;
+    border-left: 2px solid @gray-lighter;
+    padding-left: 5px;
   }
 
   #content {
-    .make-sm-column(9);
+    .make-sm-column(8);
+  }
+}
 
-    img {
-      .pull-left();
-      margin-right: 8px;
-      max-height: 100px;
-    }
-
-    .lead {
-      font-size: 24px;
-      line-height: 1.45;
-    }
+@media (min-width: @screen-md-min) {
+  #nav {
+    .make-md-column(3);
   }
 }
