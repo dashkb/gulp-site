@@ -1,7 +1,55 @@
-body {
+@import '../bower_components/bootstrap/less/bootstrap';
+@import '../bower_components/font-awesome/less/font-awesome';
+
+html, body, #page, #content {
   height: 100%;
 }
 
-#content {
-  .container;
+#page {
+  .container();
+}
+
+#content, #nav {
+  .make-sm-column(12);
+}
+
+#nav ul {
+  .list-group;
+  border-radius: 3px;
+  background: darken(#fff, 3%);
+  li {
+    .list-group-item;
+  }
+
+  li.name {
+    .h2;
+  }
+
+  i {
+    margin-right: 5px;
+  }
+}
+
+@media (min-width: @screen-sm-min) {
+  #nav {
+    display: block;
+    margin-top: 20px;
+    .make-sm-column(3);
+    .pull-right;
+  }
+
+  #content {
+    .make-sm-column(9);
+
+    img {
+      .pull-left();
+      margin-right: 8px;
+      max-height: 100px;
+    }
+
+    .lead {
+      font-size: 24px;
+      line-height: 1.45;
+    }
+  }
 }
