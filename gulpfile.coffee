@@ -16,7 +16,7 @@ fs         = require 'fs'
 connect    = require 'connect'
 
 gulp.task 'layout', ->
-  gulp.src('./src/layout.haml')
+  gulp.src('./src/**.haml')
     .pipe(haml())
     .pipe(gulp.dest './tmp')
 
@@ -29,8 +29,8 @@ gulp.task 'pages', ['layout'], ->
     highlight: (code) ->
       require('highlight.js').highlightAuto(code).value
 
-  layout  = fs.readFileSync './tmp/layout.html'
-  nav     = fs.readFileSync './tmp/nav.html'
+  layout      = fs.readFileSync './tmp/layout.html'
+  nav         = fs.readFileSync './tmp/nav.html'
   applyLayout = mapStream (file, cb) ->
     if file.isNull()
       cb null, file
@@ -38,6 +38,7 @@ gulp.task 'pages', ['layout'], ->
       cb new Error "stream NYI"
     else
       file.contents = new Buffer gutil.template layout,
+        nav: nav
         content: file.contents.toString 'utf8'
         file: file
         title: 'A Page'
@@ -70,12 +71,9 @@ gulp.task 'js-deps', ->
   ]).pipe(concat 'deps.js')
     .pipe(gulp.dest './tmp')
 
-gulp.task 'css-deps', ->
-  gulp.src([
-    './bower_components/bootstrap/less/bootstrap.less'
-  ]).pipe(less())
-    .pipe(concat 'deps.css')
-    .pipe(gulp.dest './tmp')
+gulp.task 'copy-fonts', ->
+  gulp.src('./bower_components/font-awesome/fonts/*')
+    .pipe(gulp.dest './build/fonts')
 
 gulp.task 'all-js', ['bundle-coffee', 'js-deps'], ->
   gulp.src([
@@ -83,16 +81,15 @@ gulp.task 'all-js', ['bundle-coffee', 'js-deps'], ->
     './tmp/bundle.js'
   ]).pipe(concat 'all.js')
     .pipe(gulpIf gulp.env.production, uglify())
-    .pipe(gulp.dest './build')
+    .pipe(gulp.dest './build/js')
 
-gulp.task 'all-css', ['bundle-less', 'css-deps'], ->
+gulp.task 'all-css', ['bundle-less', 'copy-fonts'], ->
   gulp.src([
-    './tmp/deps.css',
     './tmp/bundle.less'
-  ]).pipe(concat 'all.less')
-    .pipe(less())
+  ]).pipe(less())
+    .pipe(concat 'all.css')
     .pipe(gulpIf gulp.env.production, csso())
-    .pipe(gulp.dest './build')
+    .pipe(gulp.dest './build/css')
 
 
 gulp.task 'build-all', ['pages', 'all-css', 'all-js'], ->
