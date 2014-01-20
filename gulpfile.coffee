@@ -14,6 +14,10 @@ mapStream  = require 'map-stream'
 haml       = require 'gulp-haml'
 fs         = require 'fs'
 connect    = require 'connect'
+fm         = require 'front-matter'
+path       = require 'path'
+slug       = require 'slug'
+git        = require 'gift'
 
 gulp.task 'layout', ->
   gulp.src('./src/**.haml')
@@ -22,34 +26,51 @@ gulp.task 'layout', ->
 
 gulp.task 'pages', ['layout'], ->
   markedOpts =
-    gfm: true
-    tables: true
-    smartypants: true
-    smartLists: true
-    highlight: (code) ->
-      require('highlight.js').highlightAuto(code).value
 
-  layout      = fs.readFileSync './tmp/layout.html'
-  nav         = fs.readFileSync './tmp/nav.html'
-  applyLayout = mapStream (file, cb) ->
-    if file.isNull()
-      cb null, file
-    else if file.isStream()
-      cb new Error "stream NYI"
-    else
-      file.contents = new Buffer gutil.template layout,
-        nav: nav
-        content: file.contents.toString 'utf8'
-        file: file
-        title: 'A Page'
-
-      cb null, file
+  layout       = fs.readFileSync './tmp/layout.html'
+  nav          = fs.readFileSync './tmp/nav.html'
+  pages        = {}
+  
 
   gulp.src('./src/**/*.md')
-    .pipe(marked markedOpts)
+    .pipe(mapStream (file, cb) ->
+      # Extract front matter
+      content = fm file.contents.toString 'utf8'
+      pages[file.path] = content.attributes
+      file.contents = new Buffer content.body
+      cb null, file
+    )
+    .pipe(marked
+      gfm: true
+      tables: true
+      smartypants: true
+      smartLists: true
+      highlight: (code) ->
+        require('highlight.js').highlightAuto(code).value
+    )
+    .pipe(mapStream (file, cb) ->
+      if file.isNull()
+        cb null, file
+      else if file.isStream()
+        cb new Error "stream NYI"
+      else
+        dir  = path.dirname file.path
+        base = path.basename file.path
+        ext  = path.extname file.path
+
+        file.path = "#{dir}/#{slug(pages[file.path].title).toLowerCase()}#{ext}"
+        console.log file.path
+
+        file.contents = new Buffer gutil.template layout,
+          nav: nav
+          content: file.contents.toString 'utf8'
+          file: file
+          title: 'A Page'
+
+        cb null, file
+    )
     .pipe(rename ext: '')
     .pipe(rename ext: '.html')
-    .pipe(applyLayout)
     .pipe(gulp.dest './build')
 
 gulp.task 'bundle-coffee', ->

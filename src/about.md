@@ -1,3 +1,7 @@
+---
+title: About
+---
+
 ## What Am I?
 
 ![Palm Tree](/images/island-square.jpg)
